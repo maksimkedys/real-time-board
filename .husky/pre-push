@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push hook..."
+echo "⏱️  Started at: $(date '+%H:%M:%S')"
+echo ""
+echo "Running tests (lint + type-check + unit tests)..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+npm test
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "✅ All pre-push checks passed!"
+echo "⏱️  Finished at: $(date '+%H:%M:%S')"
