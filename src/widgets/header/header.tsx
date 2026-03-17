@@ -14,8 +14,14 @@ import {
   SheetTitle,
 } from '@/shared/ui/sheet';
 import { SidebarContent } from '@/widgets/sidebar/sidebar-content';
+import { Profile, Workspace } from '@/shared/types/models.types';
 
-export function Header() {
+interface HeaderProps {
+  profile: Profile | null;
+  workspaces: Workspace[];
+}
+
+export function Header({ profile, workspaces = [] }: HeaderProps) {
   const router = useRouter();
   const pathname = usePathname();
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
@@ -35,7 +41,7 @@ export function Header() {
       router.push('/sign-in');
       router.refresh();
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.error('Sign out error:', error);
     } finally {
       setIsLoggingOut(false);
     }
@@ -54,7 +60,11 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="w-64 p-0">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <SidebarContent onItemClick={() => setIsMobileMenuOpen(false)} />
+              <SidebarContent
+                profile={profile}
+                workspaces={workspaces}
+                onItemClick={() => setIsMobileMenuOpen(false)}
+              />
             </SheetContent>
           </Sheet>
         )}

@@ -1,18 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-import { useSessionStore } from '@/entities/session/model/session.store';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
+import { Profile } from '@/shared/types/models.types';
 
-interface Output {
-  isDeleting: boolean;
-  handleDeleteAccount: () => Promise<void>;
-}
-
-export const useDangerZoneCard = (): Output => {
+export const useDangerZoneCard = (profile: Profile | null) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-  const profile = useSessionStore((state) => state.profile);
   const supabase = createSupabaseBrowserClient();
 
   const handleDeleteAccount = async () => {

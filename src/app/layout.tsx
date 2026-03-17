@@ -24,11 +24,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-
-            <main className="flex-1">{children}</main>
-          </div>
+          <main className="flex-1">{children}</main>
         </ThemeProvider>
       </body>
     </html>

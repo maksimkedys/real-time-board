@@ -11,9 +11,14 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { useDangerZoneCard } from '../hooks/use-danger-zone-card';
+import { Profile } from '@/shared/types/models.types';
 
-export function DangerZoneCard() {
-  const { isDeleting, handleDeleteAccount } = useDangerZoneCard();
+interface DangerZoneCardProps {
+  profile: Profile | null;
+}
+
+export function DangerZoneCard({ profile }: DangerZoneCardProps) {
+  const { isDeleting, handleDeleteAccount } = useDangerZoneCard(profile);
 
   return (
     <Card className="border-destructive/20">

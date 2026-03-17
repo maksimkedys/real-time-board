@@ -1,11 +1,9 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/shared/api/supabase/server';
+import { getUserWorkspaces } from '@/entities/session/api/session.queries';
+
+import { Header } from '@/widgets/header/header';
 import { Sidebar } from '@/widgets/sidebar/sidebar';
-import { SessionInitializer } from '@/entities/session/ui/session-initializer';
-import {
-  getUserProfile,
-  getUserWorkspaces,
-} from '@/entities/session/api/session.queries';
 
 export default async function MainLayout({
   children,
@@ -13,33 +11,31 @@ export default async function MainLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) return <div>Supabase not configured</div>;
 
   const {
     data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect('/sign-in');
+  } = await supabase!.auth.getUser();
 
-  const [profile, workspaces] = await Promise.all([
-    getUserProfile(user.id, user.email).catch(() => ({
-      id: user.id,
-      email: user.email ?? null,
-      full_name: null,
-      avatar_url: null,
-      created_at: null,
-    })),
-    getUserWorkspaces(user.id).catch(() => []),
-  ]);
+  if (!user) {
+    redirect('/sign-in');
+  }
+
+  const { data: profile } = await supabase!
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+
+  const workspaces = await getUserWorkspaces(user.id).catch(() => []);
 
   return (
-    <div className="flex h-[calc(100%-56px)] w-full overflow-hidden">
-      <SessionInitializer profile={profile} workspaces={workspaces} />
+    <div className="flex min-h-screen w-full flex-col bg-background">
+      <Header profile={profile} workspaces={workspaces} />
 
-      <Sidebar />
-
-      <main className="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-transparent p-4 md:p-6">
-        {children}
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar profile={profile} workspaces={workspaces} />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+      </div>
     </div>
   );
 }

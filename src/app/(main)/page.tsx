@@ -1,11 +1,23 @@
-'use client';
-
+import { redirect } from 'next/navigation';
 import { Plus } from 'lucide-react';
-import { useSessionStore } from '@/entities/session/model/session.store';
-import { Button } from '@/shared/ui/button';
 
-export default function MainPage() {
-  const workspaces = useSessionStore((state) => state.workspaces);
+import { createSupabaseServerClient } from '@/shared/api/supabase/server';
+import { getUserWorkspaces } from '@/entities/session/api/session.queries';
+import { getBoardsByWorkspace } from '@/entities/board/api/board.queries';
+import { Boards } from '@/features/boards/ui/boards';
+
+export default async function MainPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ workspaceId?: string }>;
+}) {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase!.auth.getUser();
+  if (!user) redirect('/sign-in');
+
+  const workspaces = await getUserWorkspaces(user.id).catch(() => []);
 
   if (workspaces.length === 0) {
     return (
@@ -22,28 +34,12 @@ export default function MainPage() {
     );
   }
 
-  return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Boards</h1>
-          <p className="text-muted-foreground">
-            Manage your projects in the current workspace.
-          </p>
-        </div>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          New Board
-        </Button>
-      </div>
+  const resolvedParams = await searchParams;
+  const activeWorkspaceId = resolvedParams.workspaceId || workspaces[0].id;
 
-      <div className="flex h-[400px] flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30">
-        <h3 className="text-xl font-medium">No boards found</h3>
-        <p className="text-muted-foreground mt-1 mb-4">
-          Create your first board to start tracking tasks.
-        </p>
-        <Button variant="outline">Create New Board</Button>
-      </div>
-    </div>
+  const initialBoards = await getBoardsByWorkspace(activeWorkspaceId);
+
+  return (
+    <Boards initialBoards={initialBoards} workspaceId={activeWorkspaceId} />
   );
 }

@@ -15,10 +15,14 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { useProfileSettingsCard } from '../hooks/use-profile-settings-card';
+import { Profile } from '@/shared/types/models.types';
 
-export function ProfileSettingsCard() {
+interface ProfileSettingsCardProps {
+  profile: Profile | null;
+}
+
+export function ProfileSettingsCard({ profile }: ProfileSettingsCardProps) {
   const {
-    profile,
     fullName,
     setFullName,
     isSavingName,
@@ -26,7 +30,7 @@ export function ProfileSettingsCard() {
     fileInputRef,
     handleAvatarUpload,
     handleSaveProfile,
-  } = useProfileSettingsCard();
+  } = useProfileSettingsCard(profile);
 
   return (
     <Card>
@@ -58,14 +62,15 @@ export function ProfileSettingsCard() {
                   'U'}
               </div>
             )}
-            <button
+
+            <Button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100"
             >
               <Camera className="h-6 w-6 text-white" />
-            </button>
-            <input
+            </Button>
+            <Input
               type="file"
               ref={fileInputRef}
               className="hidden"

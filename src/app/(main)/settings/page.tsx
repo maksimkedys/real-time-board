@@ -1,7 +1,19 @@
+import { createSupabaseServerClient } from '@/shared/api/supabase/server';
 import { ProfileSettingsCard } from '@/features/settings/ui/profile-settings-card';
 import { DangerZoneCard } from '@/features/settings/ui/danger-zone-card';
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase!.auth.getUser();
+
+  const { data: profile } = await supabase!
+    .from('profiles')
+    .select('*')
+    .eq('id', user?.id || '')
+    .single();
+
   return (
     <div className="mx-auto max-w-4xl space-y-8 pb-10">
       <div>
@@ -12,9 +24,8 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid gap-6">
-        <ProfileSettingsCard />
-
-        <DangerZoneCard />
+        <ProfileSettingsCard profile={profile} />
+        <DangerZoneCard profile={profile} />
       </div>
     </div>
   );

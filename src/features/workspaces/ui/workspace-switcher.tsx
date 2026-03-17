@@ -21,14 +21,18 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 import { useWorkspaceSwitcher } from '../hooks/use-workspace-switcher';
+import { Workspace } from '@/shared/types/models.types';
+
+interface WorkspaceSwitcherProps {
+  workspaces: Workspace[];
+  onItemClick?: () => void;
+}
 
 export function WorkspaceSwitcher({
+  workspaces,
   onItemClick,
-}: {
-  onItemClick?: () => void;
-}) {
+}: WorkspaceSwitcherProps) {
   const {
-    workspaces,
     activeWorkspaceId,
     isOpen,
     setIsOpen,
@@ -37,13 +41,13 @@ export function WorkspaceSwitcher({
     isLoading,
     handleSelectWorkspace,
     handleCreateWorkspace,
-  } = useWorkspaceSwitcher(onItemClick);
+  } = useWorkspaceSwitcher(workspaces, onItemClick);
 
   return (
     <>
       <div className="flex items-center gap-2">
         <Select
-          value={activeWorkspaceId || undefined}
+          value={activeWorkspaceId || ''}
           onValueChange={handleSelectWorkspace}
         >
           <SelectTrigger className="w-full bg-transparent border-none shadow-none focus:ring-0">

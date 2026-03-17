@@ -1,33 +1,10 @@
-import {
-  useState,
-  useRef,
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  RefObject,
-} from 'react';
+import { useState, useRef, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-
-import { useSessionStore } from '@/entities/session/model/session.store';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Profile } from '@/shared/types/models.types';
 
-interface Output {
-  profile: Profile | null;
-  fullName: string;
-  setFullName: Dispatch<SetStateAction<string>>;
-  isSavingName: boolean;
-  isUploadingAvatar: boolean;
-  fileInputRef: RefObject<HTMLInputElement | null>;
-  handleAvatarUpload: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
-  handleSaveProfile: () => Promise<void>;
-}
-
-export const useProfileSettingsCard = (): Output => {
+export const useProfileSettingsCard = (profile: Profile | null) => {
   const router = useRouter();
-  const profile = useSessionStore((state) => state.profile);
-  const updateProfile = useSessionStore((state) => state.updateProfile);
-
   const supabase = createSupabaseBrowserClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,7 +39,6 @@ export const useProfileSettingsCard = (): Output => {
 
       if (updateError) throw updateError;
 
-      if (updateProfile) updateProfile({ avatar_url: publicUrl });
       router.refresh();
     } catch (error) {
       console.error('Error of downloading avatar:', error);
@@ -83,17 +59,15 @@ export const useProfileSettingsCard = (): Output => {
 
       if (error) throw error;
 
-      if (updateProfile) updateProfile({ full_name: fullName });
       router.refresh();
     } catch (error) {
-      console.error('Error profile update:', error);
+      console.error('Error saving profile:', error);
     } finally {
       setIsSavingName(false);
     }
   };
 
   return {
-    profile,
     fullName,
     setFullName,
     isSavingName,

@@ -1,61 +1,60 @@
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-import { useSessionStore } from '@/entities/session/model/session.store';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
+import { Workspace } from '@/shared/types/models.types';
 
-export const useWorkspaceSwitcher = (onItemClick?: () => void) => {
+export const useWorkspaceSwitcher = (
+  workspaces: Workspace[],
+  onItemClick?: () => void
+) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createSupabaseBrowserClient();
 
-  const { profile, workspaces, activeWorkspaceId, setActiveWorkspace } =
-    useSessionStore();
+  const urlWorkspaceId = searchParams.get('workspaceId');
+  const activeWorkspaceId =
+    urlWorkspaceId || (workspaces.length > 0 ? workspaces[0].id : '');
 
   const [isOpen, setIsOpen] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSelectWorkspace = (id: string) => {
-    setActiveWorkspace(id);
     router.push(`/?workspaceId=${id}`);
     if (onItemClick) onItemClick();
   };
 
   const handleCreateWorkspace = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newWorkspaceName.trim() || !profile?.id) return;
-
-    if (!supabase) return;
+    if (!newWorkspaceName.trim() || !supabase) return;
 
     try {
       setIsLoading(true);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       const { data, error } = await supabase
         .from('workspaces')
-        .insert({ name: newWorkspaceName.trim(), owner_id: profile.id })
+        .insert({ name: newWorkspaceName.trim(), owner_id: user?.id })
         .select()
         .single();
 
       if (error) throw error;
 
-      useSessionStore.setState((state) => ({
-        workspaces: [...state.workspaces, data],
-        activeWorkspaceId: data.id,
-      }));
-
       setIsOpen(false);
       setNewWorkspaceName('');
-      handleSelectWorkspace(data.id);
+
+      router.push(`/?workspaceId=${data.id}`);
       router.refresh();
     } catch (error) {
-      console.error('Error of creating workspace:', error);
+      console.error('Помилка створення воркспейсу:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return {
-    workspaces,
     activeWorkspaceId,
     isOpen,
     setIsOpen,

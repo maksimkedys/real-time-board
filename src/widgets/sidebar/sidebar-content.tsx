@@ -1,23 +1,37 @@
 'use client';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { LayoutDashboard, Settings } from 'lucide-react';
-
-import { useSessionStore } from '@/entities/session/model/session.store';
 import { WorkspaceSwitcher } from '@/features/workspaces/ui/workspace-switcher';
+import { Profile, Workspace } from '@/shared/types/models.types';
 import Image from 'next/image';
 
-export function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
-  const profile = useSessionStore((state) => state.profile);
+interface SidebarContentProps {
+  profile: Profile | null;
+  workspaces: Workspace[];
+  onItemClick?: () => void;
+}
+
+export function SidebarContent({
+  profile,
+  workspaces,
+  onItemClick,
+}: SidebarContentProps) {
+  const searchParams = useSearchParams();
+  const urlWorkspaceId = searchParams.get('workspaceId');
+  const activeWorkspaceId =
+    urlWorkspaceId || (workspaces.length > 0 ? workspaces[0].id : '');
+
   return (
     <>
-      <div className="flex h-14 items-center border-b border-border px-4">
-        <WorkspaceSwitcher onItemClick={onItemClick} />
+      <div className="flex h-14 items-center border-b border-border px-2">
+        <WorkspaceSwitcher workspaces={workspaces} onItemClick={onItemClick} />
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
         <Link
-          href="/"
+          href={`/?workspaceId=${activeWorkspaceId}`}
           onClick={onItemClick}
           className="flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-sidebar-accent"
         >
