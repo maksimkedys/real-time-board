@@ -20,7 +20,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
+    <aside className="flex h-[calc(100dvh-56px)] w-64 flex-col border-r border-border bg-sidebar text-sidebar-foreground">
       <div className="flex h-14 items-center border-b border-border px-4">
         <select
           value={activeWorkspaceId || ''}
@@ -54,7 +54,6 @@ export function Sidebar() {
         </Link>
       </nav>
 
-      {/* Користувач */}
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-medium uppercase text-primary">
