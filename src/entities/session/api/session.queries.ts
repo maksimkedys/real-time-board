@@ -1,5 +1,5 @@
 import { createSupabaseServerClient } from '@/shared/api/supabase/server';
-import type { Profile, Workspace } from '@/shared/types/models.types';
+import type { Workspace } from '@/shared/types/models.types';
 import { cache } from 'react';
 
 export const getUserProfile = cache(async (userId: string, email?: string) => {

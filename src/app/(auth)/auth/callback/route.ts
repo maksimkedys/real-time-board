@@ -37,7 +37,7 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
     } else {
-      console.error('Помилка обміну коду на сесію:', error.message);
+      console.error('Session error:', error.message);
     }
   }
 

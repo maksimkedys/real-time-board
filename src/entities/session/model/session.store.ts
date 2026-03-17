@@ -7,17 +7,25 @@ interface SessionState {
   activeWorkspaceId: string | null;
   setSession: (profile: Profile | null, workspaces: Workspace[]) => void;
   setActiveWorkspace: (id: string) => void;
+  updateProfile: (data: Partial<Profile>) => void;
 }
 
 export const useSessionStore = create<SessionState>((set) => ({
   profile: null,
   workspaces: [],
   activeWorkspaceId: null,
+
   setSession: (profile, workspaces) =>
     set({
       profile,
       workspaces,
       activeWorkspaceId: workspaces.length > 0 ? workspaces[0].id : null,
     }),
+
   setActiveWorkspace: (id) => set({ activeWorkspaceId: id }),
+
+  updateProfile: (data) =>
+    set((state) => ({
+      profile: state.profile ? { ...state.profile, ...data } : null,
+    })),
 }));
