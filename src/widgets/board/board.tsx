@@ -1,21 +1,12 @@
 import { Button } from '@/shared/ui/button';
 import { sortItems } from '../../utils';
 
-export type Workspace = { id: string; name: string };
-export type Board = { id: string; workspace_id: string; title: string };
-export type Column = {
-  id: string;
-  board_id: string;
-  title: string;
-  position: number;
-};
-export type Card = {
-  id: string;
-  column_id: string;
-  title: string;
-  description: string | null;
-  position: number;
-};
+import type {
+  Workspace,
+  Board,
+  Column,
+  Card,
+} from '@/shared/types/models.types';
 
 type BoardViewData = {
   workspace: Workspace;
