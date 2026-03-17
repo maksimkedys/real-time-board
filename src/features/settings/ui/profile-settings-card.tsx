@@ -38,7 +38,7 @@ export function ProfileSettingsCard() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center gap-6">
-          <div className="relative h-20 w-20 overflow-hidden rounded-full bg-primary/10">
+          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-primary/10">
             {isUploadingAvatar ? (
               <div className="flex h-full w-full items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -58,7 +58,6 @@ export function ProfileSettingsCard() {
                   'U'}
               </div>
             )}
-
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

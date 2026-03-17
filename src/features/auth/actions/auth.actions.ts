@@ -64,7 +64,7 @@ export async function signUpAction(
       password,
       options: {
         data: {
-          full_name: fullName || null,
+          full_name: fullName,
         },
       },
     });
