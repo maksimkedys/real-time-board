@@ -86,7 +86,7 @@ export function Header({ profile, workspaces = [] }: HeaderProps) {
             size="sm"
             onClick={handleSignOut}
             disabled={isLoggingOut}
-            className="text-muted-foreground hover:text-foreground hidden sm:flex"
+            className="text-muted-foreground hover:text-foreground flex"
           >
             {isLoggingOut ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './global.css';
 import { ThemeProvider } from '@/app/providers/theme-provider';
-import { Header } from '@/widgets/header/header';
 
 const inter = Inter({
   variable: '--font-sans',
