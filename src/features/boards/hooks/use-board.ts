@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Card, Column } from '@/shared/types/models.types';
+import { DropResult } from '@hello-pangea/dnd';
 
 export const useBoard = (
   boardId: string,
@@ -191,6 +192,148 @@ export const useBoard = (
     }
   };
 
+  const handleDragEnd = async (result: DropResult) => {
+    const { destination, source, type } = result;
+
+    if (!destination) return;
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    if (type === 'column') {
+      const newColumns = Array.from(columns).sort(
+        (a, b) => (a.position || 0) - (b.position || 0)
+      );
+      const [movedColumn] = newColumns.splice(source.index, 1);
+      newColumns.splice(destination.index, 0, movedColumn);
+
+      const updatedColumns = newColumns.map((col, index) => ({
+        ...col,
+        position: index,
+      }));
+      setColumns(updatedColumns);
+
+      try {
+        if (!supabase) throw new Error('Supabase init error');
+
+        await Promise.all(
+          updatedColumns.map((col) =>
+            supabase
+              .from('columns')
+              .update({ position: col.position })
+              .eq('id', col.id)
+          )
+        );
+      } catch (error) {
+        console.error('Error updating column positions:', error);
+        setColumns(columns);
+      }
+      return;
+    }
+
+    if (type === 'card') {
+      const sourceColId = source.droppableId;
+      const destColId = destination.droppableId;
+
+      const sourceCards = cards
+        .filter((c) => c.column_id === sourceColId)
+        .sort((a, b) => (a.position || 0) - (b.position || 0));
+
+      const destCards =
+        sourceColId === destColId
+          ? sourceCards
+          : cards
+              .filter((c) => c.column_id === destColId)
+              .sort((a, b) => (a.position || 0) - (b.position || 0));
+
+      if (sourceColId === destColId) {
+        const [movedCard] = sourceCards.splice(source.index, 1);
+        sourceCards.splice(destination.index, 0, movedCard);
+
+        const updatedCards = sourceCards.map((c, idx) => ({
+          ...c,
+          position: idx,
+        }));
+
+        setCards((prev) =>
+          prev.map((c) =>
+            c.column_id === sourceColId
+              ? updatedCards.find((uc) => uc.id === c.id) || c
+              : c
+          )
+        );
+
+        try {
+          await Promise.all(
+            updatedCards.map((card) =>
+              supabase!
+                .from('cards')
+                .update({ position: card.position })
+                .eq('id', card.id)
+            )
+          );
+        } catch (error) {
+          console.error(error);
+          setCards(cards);
+        }
+      } else {
+        const movedCard = {
+          ...sourceCards.splice(source.index, 1)[0],
+          column_id: destColId,
+        };
+        destCards.splice(destination.index, 0, movedCard);
+
+        const updatedSource = sourceCards.map((c, idx) => ({
+          ...c,
+          position: idx,
+        }));
+        const updatedDest = destCards.map((c, idx) => ({
+          ...c,
+          position: idx,
+        }));
+
+        setCards((prev) =>
+          prev.map((c) => {
+            if (c.id === movedCard.id)
+              return { ...movedCard, position: destination.index };
+            if (c.column_id === sourceColId)
+              return updatedSource.find((uc) => uc.id === c.id) || c;
+            if (c.column_id === destColId)
+              return updatedDest.find((uc) => uc.id === c.id) || c;
+            return c;
+          })
+        );
+
+        try {
+          await Promise.all([
+            supabase!
+              .from('cards')
+              .update({ column_id: destColId, position: destination.index })
+              .eq('id', movedCard.id),
+            ...updatedSource.map((card) =>
+              supabase!
+                .from('cards')
+                .update({ position: card.position })
+                .eq('id', card.id)
+            ),
+            ...updatedDest.map((card) =>
+              supabase!
+                .from('cards')
+                .update({ position: card.position })
+                .eq('id', card.id)
+            ),
+          ]);
+        } catch (error) {
+          console.error(error);
+          setCards(cards);
+        }
+      }
+    }
+  };
+
   return {
     columns,
     cards,
@@ -200,5 +343,6 @@ export const useBoard = (
     handleAddCard,
     handleDeleteCard,
     handleUpdateCard,
+    handleDragEnd,
   };
 };
