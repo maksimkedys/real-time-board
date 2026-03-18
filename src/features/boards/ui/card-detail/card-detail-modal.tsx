@@ -11,13 +11,12 @@ import {
   DialogTitle,
 } from '@/shared/ui/dialog';
 
-import { Card } from '@/shared/types/models.types';
+import { Card, Profile } from '@/shared/types/models.types';
 
 import { CardDescription } from './card-description';
 import { CardActivitySection } from './card-activity-section';
 import { CardSidebar } from './card-sidebar';
 import { useCardDetails } from '../../hooks/use-card-details';
-import { useCardAssignees } from '../../hooks/use-card-assignees';
 import { useCardDetailModal } from '../../hooks/use-card-detail-modal';
 
 interface CardDetailModalProps {
@@ -27,6 +26,10 @@ interface CardDetailModalProps {
   columnTitle: string;
   onUpdate: (id: string, updates: Partial<Card>) => void;
   onDelete: (id: string) => void;
+  assignees: Profile[];
+  availableUsers: Profile[];
+  toggleAssignee: (user: Profile) => void;
+  isLoadingAssignees: boolean;
 }
 
 export function CardDetailModal({
@@ -36,11 +39,13 @@ export function CardDetailModal({
   columnTitle,
   onUpdate,
   onDelete,
+  assignees,
+  availableUsers,
+  toggleAssignee,
+  isLoadingAssignees,
 }: CardDetailModalProps) {
   const { activities, currentUser, isLoadingActivities, logActivity } =
     useCardDetails(card.id, isOpen);
-  const { assignees, availableUsers, toggleAssignee, isLoadingAssignees } =
-    useCardAssignees(card.id);
 
   const {
     title,

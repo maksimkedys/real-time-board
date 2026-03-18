@@ -25,7 +25,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 
 import { Card } from '@/shared/types/models.types';
 import { CardDetailModal } from './card-detail/card-detail-modal';
-import { useCardAssignees } from '../hooks/use-card-assignees'; // <--- Додали
+import { useCardAssignees } from '../hooks/use-card-assignees';
 
 interface BoardCardProps {
   card: Card;
@@ -42,8 +42,8 @@ export function BoardCard({
 }: BoardCardProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const { assignees } = useCardAssignees(card.id);
-
+  const { assignees, availableUsers, toggleAssignee, isLoadingAssignees } =
+    useCardAssignees(card.id);
   return (
     <>
       <div
@@ -130,6 +130,10 @@ export function BoardCard({
         columnTitle={columnTitle}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        assignees={assignees}
+        availableUsers={availableUsers}
+        toggleAssignee={toggleAssignee}
+        isLoadingAssignees={isLoadingAssignees}
       />
 
       <AlertDialog

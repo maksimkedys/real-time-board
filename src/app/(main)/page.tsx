@@ -40,6 +40,10 @@ export default async function MainPage({
   const initialBoards = await getBoardsByWorkspace(activeWorkspaceId);
 
   return (
-    <Boards initialBoards={initialBoards} workspaceId={activeWorkspaceId} />
+    <Boards
+      initialBoards={initialBoards}
+      workspaceId={activeWorkspaceId}
+      key={activeWorkspaceId}
+    />
   );
 }
