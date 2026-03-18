@@ -32,7 +32,8 @@ interface BoardColumnProps {
   onAddCard: (
     columnId: string,
     title: string,
-    description: string | null
+    description: string | null,
+    dueDate: string | null
   ) => Promise<void>;
   onDeleteColumn: (columnId: string) => void;
   onUpdateColumn: (columnId: string, title: string) => void;
@@ -119,13 +120,13 @@ export function BoardColumn({
         </div>
 
         <div className="flex flex-col gap-2 overflow-y-auto mb-2">
-          {/* ТУТ МАЄ БУТИ ТІЛЬКИ ОДИН РЕНДЕР КАРТОК */}
           {cards.map((card) => (
             <BoardCard
               key={card.id}
               card={card}
               onDelete={onDeleteCard}
               onUpdate={onUpdateCard}
+              columnTitle={column.title}
             />
           ))}
         </div>
@@ -167,8 +168,8 @@ export function BoardColumn({
       <CardModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSave={(title, description) =>
-          onAddCard(column.id, title, description)
+        onSave={(title, description, dueDate) =>
+          onAddCard(column.id, title, description, dueDate)
         }
         modalTitle="Create New Card"
         submitButtonText="Create Card"

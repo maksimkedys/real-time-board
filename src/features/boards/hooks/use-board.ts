@@ -105,7 +105,8 @@ export const useBoard = (
   const handleAddCard = async (
     columnId: string,
     title: string,
-    description: string | null = null
+    description: string | null = null,
+    dueDate: string | null = null
   ) => {
     const columnCards = cards.filter((c) => c.column_id === columnId);
     const position = columnCards.length;
@@ -118,7 +119,7 @@ export const useBoard = (
         column_id: columnId,
         position,
         description,
-        due_date: null,
+        due_date: dueDate,
         created_at: new Date().toISOString(),
       } as Card;
 
@@ -128,7 +129,13 @@ export const useBoard = (
 
       const { data, error } = await supabase
         .from('cards')
-        .insert({ title, column_id: columnId, position, description })
+        .insert({
+          title,
+          column_id: columnId,
+          position,
+          description,
+          due_date: dueDate,
+        })
         .select()
         .single();
 

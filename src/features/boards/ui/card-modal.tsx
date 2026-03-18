@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Save } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -12,12 +11,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog';
+import { useCardModal } from '../hooks/use-card-modal';
 
 interface CardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (title: string, description: string | null) => void;
-  initialData?: { title: string; description: string | null };
+  onSave: (
+    title: string,
+    description: string | null,
+    dueDate: string | null
+  ) => void;
+  initialData?: {
+    title: string;
+    description: string | null;
+    due_date?: string | null;
+  };
   modalTitle?: string;
   submitButtonText?: string;
 }
@@ -27,30 +35,18 @@ export function CardModal({
   onClose,
   onSave,
   initialData,
-  modalTitle = 'Card Details',
+  modalTitle = 'Create Card',
   submitButtonText = 'Save',
 }: CardModalProps) {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [description, setDescription] = useState(
-    initialData?.description || ''
-  );
-
-  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
-  if (isOpen !== prevIsOpen) {
-    setPrevIsOpen(isOpen);
-    if (isOpen) {
-      setTitle(initialData?.title || '');
-      setDescription(initialData?.description || '');
-    }
-  }
-
-  const handleSave = () => {
-    if (!title.trim()) return;
-    onSave(title.trim(), description.trim() || null);
-    setTitle('');
-    setDescription('');
-    onClose();
-  };
+  const {
+    title,
+    setTitle,
+    description,
+    setDescription,
+    dueDate,
+    setDueDate,
+    handleSave,
+  } = useCardModal(isOpen, onClose, onSave, initialData);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -69,12 +65,7 @@ export function CardModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter a title..."
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleSave();
-                }
-              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
           </div>
           <div className="grid gap-2">
@@ -83,7 +74,16 @@ export function CardModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Add a more detailed description..."
-              className="min-h-[150px] resize-none focus-visible:ring-primary/30"
+              className="min-h-[120px] resize-none focus-visible:ring-primary/30"
+            />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-sm font-medium">Due Date</label>
+            <Input
+              type="date"
+              value={dueDate || ''}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="w-full"
             />
           </div>
         </div>
