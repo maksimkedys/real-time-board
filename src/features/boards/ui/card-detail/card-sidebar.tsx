@@ -99,7 +99,7 @@ export function CardSidebar({
         </div>
         <Button
           variant="destructive"
-          className="w-full justify-start cursor-pointer text-sm h-8 mt-4 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+          className="w-full justify-start cursor-pointer text-sm h-8 mt-4 bg-destructive/10 text-destructive hover:bg-destructive hover:text-white"
           size="sm"
           onClick={onDelete}
         >

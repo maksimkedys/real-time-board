@@ -31,6 +31,7 @@ export function BoardAddList({ onAddList }: BoardAddListProps) {
             placeholder="Enter list title..."
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
+            maxLength={100}
             className="bg-card shadow-sm border-primary/30 focus-visible:ring-primary/30"
           />
           <div className="flex items-center gap-2">

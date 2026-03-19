@@ -47,6 +47,7 @@ export function BoardColumnHeader({
           onChange={(e) => setEditTitleValue(e.target.value)}
           onBlur={handleTitleUpdate}
           onKeyDown={(e) => e.key === 'Enter' && handleTitleUpdate()}
+          maxLength={100}
           className="h-7 text-sm font-semibold px-2"
         />
       ) : (

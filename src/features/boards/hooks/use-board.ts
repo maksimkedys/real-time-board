@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
@@ -17,7 +17,17 @@ export const useBoard = (
   const [columns, setColumns] = useState<Column[]>(initialColumns);
   const [cards, setCards] = useState<Card[]>(initialCards);
 
-  useBoardSync(boardId, columns, setColumns, setCards);
+  const pendingColumnIds = useRef<Set<string>>(new Set());
+  const pendingCardIds = useRef<Set<string>>(new Set());
+
+  useBoardSync(
+    boardId,
+    columns,
+    setColumns,
+    setCards,
+    pendingColumnIds,
+    pendingCardIds
+  );
 
   useEffect(() => {
     setColumns(initialColumns);
@@ -40,6 +50,7 @@ export const useBoard = (
         created_at: new Date().toISOString(),
       } as Column;
 
+      pendingColumnIds.current.add(tempId);
       setColumns((prev) => [...prev, newCol]);
 
       if (!supabase) throw new Error('Supabase init error');
@@ -52,9 +63,11 @@ export const useBoard = (
 
       if (error) throw error;
 
+      pendingColumnIds.current.delete(tempId);
       setColumns((prev) => prev.map((c) => (c.id === tempId ? data : c)));
       router.refresh();
     } catch (error) {
+      pendingColumnIds.current.delete(tempId);
       console.error('Error adding column:', error);
       setColumns(columns);
     }
@@ -127,6 +140,7 @@ export const useBoard = (
         created_at: new Date().toISOString(),
       } as Card;
 
+      pendingCardIds.current.add(tempId);
       setCards((prev) => [...prev, newCard]);
 
       if (!supabase) throw new Error('Supabase init error');
@@ -145,9 +159,11 @@ export const useBoard = (
 
       if (error) throw error;
 
+      pendingCardIds.current.delete(tempId);
       setCards((prev) => prev.map((c) => (c.id === tempId ? data : c)));
       router.refresh();
     } catch (error) {
+      pendingCardIds.current.delete(tempId);
       console.error('Error adding card:', error);
       setCards(cards);
     }

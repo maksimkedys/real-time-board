@@ -171,6 +171,7 @@ export function BoardHeader({ board }: BoardHeaderProps) {
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleRenameBoard()}
+              maxLength={100}
             />
           </div>
           <DialogFooter>

@@ -78,7 +78,8 @@ export function CardDetailModal({
                 onChange={(e) => setTitle(e.target.value)}
                 onBlur={handleTitleBlur}
                 onKeyDown={(e) => e.key === 'Enter' && handleTitleBlur()}
-                className="text-xl font-semibold border-transparent px-1 -ml-1 h-8 focus-visible:ring-1 focus-visible:border-border shadow-none bg-transparent"
+                maxLength={200}
+                className="text-xl font-semibold text-foreground border-transparent px-1 -ml-1 h-8 focus-visible:ring-1 focus-visible:border-border shadow-none bg-transparent"
               />
               <p className="text-sm text-muted-foreground mt-0.5 px-1">
                 in list{' '}

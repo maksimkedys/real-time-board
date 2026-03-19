@@ -28,7 +28,7 @@ export function BoardCardContent({
   return (
     <>
       <div className="flex items-start justify-between gap-2">
-        <p className="text-sm font-medium text-card-foreground leading-snug flex-1">
+        <p className="text-sm font-medium text-card-foreground leading-snug flex-1 line-clamp-2 break-words">
           {card.title}
         </p>
         <DropdownMenu>

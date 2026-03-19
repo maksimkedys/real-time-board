@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, RefObject } from 'react';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Card, Column } from '@/shared/types/models.types';
 
@@ -6,7 +6,9 @@ export const useBoardSync = (
   boardId: string,
   columns: Column[],
   setColumns: React.Dispatch<React.SetStateAction<Column[]>>,
-  setCards: React.Dispatch<React.SetStateAction<Card[]>>
+  setCards: React.Dispatch<React.SetStateAction<Card[]>>,
+  pendingColumnIds: RefObject<Set<string>>,
+  pendingCardIds: RefObject<Set<string>>
 ) => {
   const supabase = createSupabaseBrowserClient();
 
@@ -33,6 +35,19 @@ export const useBoardSync = (
           if (payload.eventType === 'INSERT') {
             setColumns((prev) => {
               if (prev.find((c) => c.id === payload.new.id)) return prev;
+              const pending = pendingColumnIds.current;
+              const tempEntry = prev.find(
+                (c) =>
+                  pending.has(c.id) &&
+                  c.board_id === payload.new.board_id &&
+                  c.position === payload.new.position
+              );
+              if (tempEntry) {
+                pending.delete(tempEntry.id);
+                return prev.map((c) =>
+                  c.id === tempEntry.id ? (payload.new as Column) : c
+                );
+              }
               return [...prev, payload.new as Column];
             });
           } else if (payload.eventType === 'UPDATE') {
@@ -60,6 +75,19 @@ export const useBoardSync = (
 
             setCards((prev) => {
               if (prev.find((c) => c.id === payload.new.id)) return prev;
+              const pending = pendingCardIds.current;
+              const tempEntry = prev.find(
+                (c) =>
+                  pending.has(c.id) &&
+                  c.column_id === payload.new.column_id &&
+                  c.position === payload.new.position
+              );
+              if (tempEntry) {
+                pending.delete(tempEntry.id);
+                return prev.map((c) =>
+                  c.id === tempEntry.id ? (payload.new as Card) : c
+                );
+              }
               return [...prev, payload.new as Card];
             });
           } else if (payload.eventType === 'UPDATE') {

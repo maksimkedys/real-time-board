@@ -46,27 +46,30 @@ export function WorkspaceSwitcher({
   return (
     <>
       <div className="flex items-center gap-2">
-        <Select
-          value={activeWorkspaceId || ''}
-          onValueChange={handleSelectWorkspace}
-        >
-          <SelectTrigger className="w-full bg-transparent border-none shadow-none focus:ring-0">
-            <SelectValue placeholder="Select a workspace" />
-          </SelectTrigger>
-          <SelectContent>
-            {workspaces.length > 0 ? (
-              workspaces.map((ws) => (
+        {workspaces.length <= 1 ? (
+          <div className="flex-1 flex items-center gap-2 px-2 py-1.5 min-h-8">
+            <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-sm font-medium truncate">
+              {workspaces[0]?.name || 'No workspace'}
+            </span>
+          </div>
+        ) : (
+          <Select
+            value={activeWorkspaceId || ''}
+            onValueChange={handleSelectWorkspace}
+          >
+            <SelectTrigger className="w-full bg-transparent border-none shadow-none focus:ring-0">
+              <SelectValue placeholder="Select a workspace" />
+            </SelectTrigger>
+            <SelectContent>
+              {workspaces.map((ws) => (
                 <SelectItem key={ws.id} value={ws.id}>
                   {ws.name}
                 </SelectItem>
-              ))
-            ) : (
-              <div className="p-2 text-sm text-muted-foreground text-center">
-                No workspaces found
-              </div>
-            )}
-          </SelectContent>
-        </Select>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Button
           variant="ghost"

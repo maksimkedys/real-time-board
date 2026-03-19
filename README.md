@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Real-Time Collaborative Board
+
+A real-time collaborative project management board built with Next.js, Supabase, and TypeScript.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router, React 19)
+- **Database & Auth**: Supabase (PostgreSQL, Auth, Realtime, Storage)
+- **Styling**: Tailwind CSS 4 + shadcn/ui (Radix UI)
+- **Drag & Drop**: @hello-pangea/dnd
+- **State**: React hooks + Zustand
+- **Validation**: Zod
+- **Testing**: Jest + Testing Library
+- **Language**: TypeScript (strict mode)
+
+## Features
+
+- **Boards & Columns** — Create, edit, delete boards and columns with inline renaming
+- **Card Management** — Add cards with title, description, due dates; edit via detail modal with activity history
+- **Drag & Drop** — Drag cards between columns and reorder columns with optimistic updates and conflict resolution
+- **Real-Time Sync** — Live updates across multiple browser tabs/users via Supabase Realtime subscriptions
+- **Presence Indicators** — See who is currently viewing the board in real-time
+- **Workspaces** — Multi-workspace support with switcher, create/manage workspaces
+- **Workspace Members** — Invite and manage workspace members
+- **Card Assignees** — Assign workspace members to cards
+- **Authentication** — Sign up, sign in, forgot password with Supabase Auth + OAuth callback
+- **Profile Settings** — Update display name and avatar
+- **Dark / Light Mode** — Theme toggle with next-themes
+- **Input Validation** — Zod schemas for all API inputs, forms, and server queries
+- **Row-Level Security** — Workspace isolation via Supabase RLS policies
+
+## Project Structure
+
+```
+src/
+├── app/              # Next.js App Router pages & layouts
+│   ├── (auth)/       # Auth pages (sign-in, sign-up, forgot-password, callback)
+│   ├── (main)/       # Main app pages (boards, settings)
+│   └── providers/    # Theme provider
+├── entities/         # Server-side data access (board, session, workspace queries)
+├── features/         # Feature modules
+│   ├── auth/         # Auth actions (server actions with Zod validation)
+│   ├── boards/       # Board hooks & UI (columns, cards, drag-drop, modals)
+│   ├── settings/     # Profile settings
+│   ├── theme-toggle/ # Dark/light mode toggle
+│   └── workspaces/   # Workspace switcher & members
+├── shared/           # Shared code
+│   ├── api/          # Supabase client/server helpers
+│   ├── lib/          # Utilities (cn)
+│   ├── schemas/      # Zod validation schemas (auth, board, workspace)
+│   ├── types/        # TypeScript types (generated from Supabase schema)
+│   └── ui/           # shadcn/ui components
+└── widgets/          # Layout widgets (header, sidebar)
+```
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
-npm run dev
-# or
+# Install dependencies
+yarn install
+
+# Set up environment variables
+cp .env.example .env.local
+# Fill in NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+# Run development server
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command              | Description                              |
+| -------------------- | ---------------------------------------- |
+| `yarn dev`           | Start development server                 |
+| `yarn build`         | Production build                         |
+| `yarn start`         | Start production server                  |
+| `yarn lint`          | Run ESLint                               |
+| `yarn test`          | Lint + type-check + unit tests           |
+| `yarn test:unit`     | Run Jest unit tests                      |
+| `yarn test:watch`    | Run tests in watch mode                  |
+| `yarn test:coverage` | Run tests with coverage report           |
+| `yarn type-check`    | TypeScript type checking                 |
+| `yarn format`        | Format code with Prettier                |

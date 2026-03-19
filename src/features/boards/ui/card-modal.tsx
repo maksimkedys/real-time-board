@@ -65,6 +65,7 @@ export function CardModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter a title..."
+              maxLength={200}
               onKeyDown={(e) => e.key === 'Enter' && handleSave()}
             />
           </div>
