@@ -8,7 +8,7 @@ A real-time collaborative project management board built with Next.js, Supabase,
 - **Database & Auth**: Supabase (PostgreSQL, Auth, Realtime, Storage)
 - **Styling**: Tailwind CSS 4 + shadcn/ui (Radix UI)
 - **Drag & Drop**: @hello-pangea/dnd
-- **State**: React hooks + Zustand
+- **State**: React hooks
 - **Validation**: Zod
 - **Testing**: Jest + Testing Library
 - **Language**: TypeScript (strict mode)
