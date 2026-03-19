@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Workspace } from '@/shared/types/models.types';
+import { workspaceNameSchema } from '@/shared/schemas/workspace.schema';
 
 export const useWorkspaceSwitcher = (
   workspaces: Workspace[],
@@ -26,7 +27,8 @@ export const useWorkspaceSwitcher = (
 
   const handleCreateWorkspace = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newWorkspaceName.trim() || !supabase) return;
+    const parsed = workspaceNameSchema.safeParse({ name: newWorkspaceName });
+    if (!parsed.success || !supabase) return;
 
     try {
       setIsLoading(true);
@@ -36,7 +38,7 @@ export const useWorkspaceSwitcher = (
 
       const { data, error } = await supabase
         .from('workspaces')
-        .insert({ name: newWorkspaceName.trim(), owner_id: user?.id })
+        .insert({ name: parsed.data.name, owner_id: user?.id })
         .select()
         .single();
 

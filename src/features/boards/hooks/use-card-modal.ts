@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { z } from 'zod';
+
+const cardTitleSchema = z.string().min(1).max(200);
 
 export const useCardModal = (
   isOpen: boolean,
@@ -33,8 +36,9 @@ export const useCardModal = (
   }
 
   const handleSave = () => {
-    if (!title.trim()) return;
-    onSave(title.trim(), description.trim() || null, dueDate);
+    const parsed = cardTitleSchema.safeParse(title.trim());
+    if (!parsed.success) return;
+    onSave(parsed.data, description.trim() || null, dueDate);
     setTitle('');
     setDescription('');
     setDueDate(null);

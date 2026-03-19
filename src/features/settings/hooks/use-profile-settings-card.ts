@@ -2,6 +2,7 @@ import { useState, useRef, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Profile } from '@/shared/types/models.types';
+import { profileUpdateSchema } from '@/shared/schemas/workspace.schema';
 
 export const useProfileSettingsCard = (profile: Profile | null) => {
   const router = useRouter();
@@ -50,12 +51,18 @@ export const useProfileSettingsCard = (profile: Profile | null) => {
   const handleSaveProfile = async () => {
     if (!profile?.id || fullName === profile?.full_name || !supabase) return;
 
+    const parsed = profileUpdateSchema.safeParse({
+      fullName,
+      profileId: profile.id,
+    });
+    if (!parsed.success) return;
+
     try {
       setIsSavingName(true);
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName })
-        .eq('id', profile.id);
+        .update({ full_name: parsed.data.fullName })
+        .eq('id', parsed.data.profileId);
 
       if (error) throw error;
 

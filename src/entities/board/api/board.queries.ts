@@ -1,13 +1,23 @@
 import { createSupabaseServerClient } from '@/shared/api/supabase/server';
+import {
+  boardIdSchema,
+  workspaceIdSchema,
+} from '@/shared/schemas/board.schema';
 
 export async function getBoardsByWorkspace(workspaceId: string) {
+  const parsed = workspaceIdSchema.safeParse({ workspaceId });
+  if (!parsed.success) {
+    console.error('Invalid workspaceId:', parsed.error.flatten());
+    return [];
+  }
+
   const supabase = await createSupabaseServerClient();
   if (!supabase) return [];
 
   const { data, error } = await supabase
     .from('boards')
     .select('*')
-    .eq('workspace_id', workspaceId)
+    .eq('workspace_id', parsed.data.workspaceId)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -19,13 +29,19 @@ export async function getBoardsByWorkspace(workspaceId: string) {
 }
 
 export async function getBoardById(boardId: string) {
+  const parsed = boardIdSchema.safeParse({ boardId });
+  if (!parsed.success) {
+    console.error('Invalid boardId:', parsed.error.flatten());
+    return null;
+  }
+
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('boards')
     .select('*')
-    .eq('id', boardId)
+    .eq('id', parsed.data.boardId)
     .single();
 
   if (error) {
@@ -36,13 +52,19 @@ export async function getBoardById(boardId: string) {
 }
 
 export async function getBoardContent(boardId: string) {
+  const parsed = boardIdSchema.safeParse({ boardId });
+  if (!parsed.success) {
+    console.error('Invalid boardId:', parsed.error.flatten());
+    return { columns: [], cards: [] };
+  }
+
   const supabase = await createSupabaseServerClient();
   if (!supabase) return { columns: [], cards: [] };
 
   const { data: columns, error: colError } = await supabase
     .from('columns')
     .select('*')
-    .eq('board_id', boardId)
+    .eq('board_id', parsed.data.boardId)
     .order('position', { ascending: true });
 
   if (colError || !columns || columns.length === 0) {

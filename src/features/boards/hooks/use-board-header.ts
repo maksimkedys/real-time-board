@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
+import { renameBoardSchema } from '@/shared/schemas/board.schema';
 
 export const useBoardHeader = (boardId: string, initialTitle: string) => {
   const router = useRouter();
@@ -24,21 +25,25 @@ export const useBoardHeader = (boardId: string, initialTitle: string) => {
   };
 
   const handleRenameBoard = async () => {
-    if (!newTitle.trim() || newTitle === boardTitle) {
+    const parsed = renameBoardSchema.safeParse({
+      title: newTitle,
+      boardId,
+    });
+    if (!parsed.success || newTitle === boardTitle) {
       setIsRenameModalOpen(false);
       return;
     }
 
     const previousTitle = boardTitle;
     try {
-      setBoardTitle(newTitle.trim());
+      setBoardTitle(parsed.data.title);
       setIsRenameModalOpen(false);
 
       if (!supabase) throw new Error('Supabase init error');
       const { error } = await supabase
         .from('boards')
-        .update({ title: newTitle.trim() })
-        .eq('id', boardId);
+        .update({ title: parsed.data.title })
+        .eq('id', parsed.data.boardId);
 
       if (error) throw error;
       router.refresh();
