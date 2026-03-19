@@ -47,12 +47,13 @@ export function BoardDetailsView({
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              <div className="flex h-full items-start gap-6 pb-4">
+              <div className="flex h-full items-start pb-4">
                 {columns.map((col, index) => (
                   <BoardColumn
                     key={col.id}
                     column={col}
                     index={index}
+                    workspaceId={board.workspace_id || ''}
                     cards={cards
                       .filter((c) => c.column_id === col.id)
                       .sort((a, b) => (a.position || 0) - (b.position || 0))}

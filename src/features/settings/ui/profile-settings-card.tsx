@@ -41,7 +41,7 @@ export function ProfileSettingsCard({ profile }: ProfileSettingsCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-primary/10">
             {isUploadingAvatar ? (
               <div className="flex h-full w-full items-center justify-center">

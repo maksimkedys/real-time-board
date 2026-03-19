@@ -23,6 +23,7 @@ interface BoardCardProps {
   card: Card;
   columnTitle: string;
   index: number;
+  workspaceId: string;
   onDelete: (id: string) => void;
   onUpdate: (id: string, updates: Partial<Card>) => void;
 }
@@ -31,6 +32,7 @@ export function BoardCard({
   card,
   columnTitle,
   index,
+  workspaceId,
   onDelete,
   onUpdate,
 }: BoardCardProps) {
@@ -38,7 +40,7 @@ export function BoardCard({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { assignees, availableUsers, toggleAssignee, isLoadingAssignees } =
-    useCardAssignees(card.id);
+    useCardAssignees(card.id, workspaceId);
 
   return (
     <>
@@ -49,9 +51,9 @@ export function BoardCard({
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             onClick={() => setIsEditDialogOpen(true)}
-            className={`group relative cursor-pointer rounded-xl border p-4 shadow-sm flex flex-col gap-3 min-h-[140px] w-full transition-colors ${
+            className={`group relative cursor-pointer rounded-xl border p-4 shadow-sm flex flex-col gap-3 min-h-[140px] w-full transition-colors mb-2 ${
               snapshot.isDragging
-                ? 'bg-background border-primary shadow-lg scale-105 z-50 ring-2 ring-primary/20'
+                ? 'bg-background border-primary shadow-lg z-50 ring-2 ring-primary/20'
                 : 'bg-card border-border/50 hover:border-primary/50 hover:shadow-md'
             }`}
           >

@@ -25,6 +25,7 @@ interface BoardColumnProps {
   column: Column;
   cards: Card[];
   index: number;
+  workspaceId: string;
   onAddCard: (
     colId: string,
     title: string,
@@ -41,6 +42,7 @@ export function BoardColumn({
   column,
   cards,
   index,
+  workspaceId,
   onAddCard,
   onDeleteColumn,
   onUpdateColumn,
@@ -68,7 +70,7 @@ export function BoardColumn({
           <div
             {...provided.draggableProps}
             ref={provided.innerRef}
-            className="flex w-72 shrink-0 flex-col rounded-xl bg-muted/40 p-3 shadow-sm border border-border/40"
+            className="flex w-72 shrink-0 flex-col rounded-xl bg-muted/40 p-3 shadow-sm border border-border/40 mr-6"
           >
             <BoardColumnHeader
               title={column.title}
@@ -87,7 +89,7 @@ export function BoardColumn({
                 <div
                   {...providedDroppable.droppableProps}
                   ref={providedDroppable.innerRef}
-                  className="flex flex-col gap-2 overflow-y-auto mb-2 min-h-[10px]"
+                  className="flex flex-col overflow-y-auto mb-2 min-h-[10px]"
                 >
                   {cards.map((card, cardIndex) => (
                     <BoardCard
@@ -95,6 +97,7 @@ export function BoardColumn({
                       card={card}
                       index={cardIndex}
                       columnTitle={column.title}
+                      workspaceId={workspaceId}
                       onDelete={onDeleteCard}
                       onUpdate={onUpdateCard}
                     />

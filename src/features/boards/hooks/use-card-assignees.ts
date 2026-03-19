@@ -12,7 +12,7 @@ interface Assignee {
   } | null;
 }
 
-export const useCardAssignees = (cardId: string) => {
+export const useCardAssignees = (cardId: string, workspaceId: string) => {
   const supabase = createSupabaseBrowserClient();
   const [assignees, setAssignees] = useState<Profile[]>([]);
   const [availableUsers, setAvailableUsers] = useState<Profile[]>([]);
@@ -36,9 +36,16 @@ export const useCardAssignees = (cardId: string) => {
           setAssignees(cleanAssignees as Profile[]);
         }
 
-        const { data: usersData } = await supabase.from('profiles').select('*');
-        if (usersData) {
-          setAvailableUsers(usersData as Profile[]);
+        const { data: membersData } = await supabase
+          .from('workspace_members')
+          .select('profiles(*)')
+          .eq('workspace_id', workspaceId);
+
+        if (membersData) {
+          const members = membersData
+            .map((m: { profiles: Profile | null }) => m.profiles)
+            .filter(Boolean);
+          setAvailableUsers(members as Profile[]);
         }
       } catch (error) {
         console.error(error);
@@ -47,8 +54,8 @@ export const useCardAssignees = (cardId: string) => {
       }
     };
 
-    if (cardId) fetchData();
-  }, [cardId, supabase]);
+    if (cardId && workspaceId) fetchData();
+  }, [cardId, workspaceId, supabase]);
 
   const toggleAssignee = async (user: Profile) => {
     if (!supabase) return;
