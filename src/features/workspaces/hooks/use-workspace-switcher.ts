@@ -50,7 +50,7 @@ export const useWorkspaceSwitcher = (
       router.push(`/?workspaceId=${data.id}`);
       router.refresh();
     } catch (error) {
-      console.error('Помилка створення воркспейсу:', error);
+      console.error('Error creating workspace:', error);
     } finally {
       setIsLoading(false);
     }

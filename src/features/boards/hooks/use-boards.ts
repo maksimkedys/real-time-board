@@ -41,7 +41,7 @@ export const useBoards = (initialBoards: Board[], workspaceId: string) => {
 
       router.refresh();
     } catch (error) {
-      console.error('Помилка створення дошки:', error);
+      console.error('Error creating board:', error);
     } finally {
       setIsCreating(false);
     }

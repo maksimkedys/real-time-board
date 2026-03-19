@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { LayoutDashboard, Settings } from 'lucide-react';
 import { WorkspaceSwitcher } from '@/features/workspaces/ui/workspace-switcher';
 import { Profile, Workspace } from '@/shared/types/models.types';
-import Image from 'next/image';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 
 interface SidebarContentProps {
   profile: Profile | null;
@@ -48,19 +48,16 @@ export function SidebarContent({
 
       <div className="border-t border-border p-4">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary/10 text-xs font-medium uppercase text-primary">
-            {profile?.avatar_url ? (
-              <Image
-                src={profile.avatar_url}
-                alt="Avatar"
-                fill
-                sizes="(max-width: 768px) 80px, 80px"
-                className="object-cover"
-              />
-            ) : (
-              profile?.full_name?.charAt(0) || profile?.email?.charAt(0) || 'U'
+          <Avatar>
+            {profile?.avatar_url && (
+              <AvatarImage src={profile.avatar_url} alt="Avatar" />
             )}
-          </div>
+            <AvatarFallback>
+              {profile?.full_name?.charAt(0) ||
+                profile?.email?.charAt(0) ||
+                'U'}
+            </AvatarFallback>
+          </Avatar>
           <div className="flex flex-1 flex-col overflow-hidden">
             <span className="truncate text-sm font-medium">
               {profile?.full_name || 'User'}

@@ -75,6 +75,7 @@ export function WorkspaceSwitcher({
           variant="ghost"
           size="icon"
           className="shrink-0"
+          aria-label="Create workspace"
           onClick={() => setIsOpen(true)}
         >
           <Plus className="h-4 w-4" />

@@ -42,7 +42,7 @@ export const useProfileSettingsCard = (profile: Profile | null) => {
 
       router.refresh();
     } catch (error) {
-      console.error('Error of downloading avatar:', error);
+      console.error('Error uploading avatar:', error);
     } finally {
       setIsUploadingAvatar(false);
     }

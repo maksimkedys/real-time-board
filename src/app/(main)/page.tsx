@@ -12,9 +12,11 @@ export default async function MainPage({
   searchParams: Promise<{ workspaceId?: string }>;
 }) {
   const supabase = await createSupabaseServerClient();
+  if (!supabase) redirect('/sign-in');
+
   const {
     data: { user },
-  } = await supabase!.auth.getUser();
+  } = await supabase.auth.getUser();
   if (!user) redirect('/sign-in');
 
   const workspaces = await getUserWorkspaces(user.id).catch(() => []);

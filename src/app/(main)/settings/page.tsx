@@ -4,11 +4,13 @@ import { DangerZoneCard } from '@/features/settings/ui/danger-zone-card';
 
 export default async function SettingsPage() {
   const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
+
   const {
     data: { user },
-  } = await supabase!.auth.getUser();
+  } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase!
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user?.id || '')

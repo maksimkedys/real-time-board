@@ -11,16 +11,17 @@ export default async function MainLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createSupabaseServerClient();
+  if (!supabase) redirect('/sign-in');
 
   const {
     data: { user },
-  } = await supabase!.auth.getUser();
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/sign-in');
   }
 
-  const { data: profile } = await supabase!
+  const { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)

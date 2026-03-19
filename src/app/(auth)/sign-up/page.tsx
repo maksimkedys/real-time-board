@@ -138,7 +138,7 @@ export default function SignUpPage() {
                   defaultValue={state?.values?.email}
                   className={cn(
                     'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
-                    state?.fieldErrors?.fullName
+                    state?.fieldErrors?.email
                       ? 'border-destructive focus-visible:ring-destructive'
                       : 'focus-visible:border-primary focus-visible:ring-primary'
                   )}
@@ -163,7 +163,7 @@ export default function SignUpPage() {
                     defaultValue=""
                     className={cn(
                       'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
-                      state?.fieldErrors?.fullName
+                      state?.fieldErrors?.password
                         ? 'border-destructive focus-visible:ring-destructive'
                         : 'focus-visible:border-primary focus-visible:ring-primary'
                     )}

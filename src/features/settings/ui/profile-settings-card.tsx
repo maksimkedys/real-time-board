@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import { Camera, Loader2, Save } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Avatar, AvatarImage, AvatarFallback } from '@/shared/ui/avatar';
 import {
   Card,
   CardContent,
@@ -42,33 +42,30 @@ export function ProfileSettingsCard({ profile }: ProfileSettingsCardProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex items-center gap-4">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full bg-primary/10">
+          <div className="relative size-20 shrink-0 overflow-hidden rounded-full">
             {isUploadingAvatar ? (
-              <div className="flex h-full w-full items-center justify-center">
+              <div className="flex size-20 items-center justify-center rounded-full bg-primary/10">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
-            ) : profile?.avatar_url ? (
-              <Image
-                src={profile.avatar_url}
-                alt="Avatar"
-                fill
-                sizes="(max-width: 768px) 80px, 80px"
-                className="object-cover"
-              />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl font-medium uppercase text-primary">
-                {profile?.full_name?.charAt(0) ||
-                  profile?.email?.charAt(0) ||
-                  'U'}
-              </div>
+              <Avatar className="size-20 text-2xl">
+                {profile?.avatar_url && (
+                  <AvatarImage src={profile.avatar_url} alt="Avatar" />
+                )}
+                <AvatarFallback className="text-2xl font-medium uppercase text-primary bg-primary/10">
+                  {profile?.full_name?.charAt(0) ||
+                    profile?.email?.charAt(0) ||
+                    'U'}
+                </AvatarFallback>
+              </Avatar>
             )}
 
             <Button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100"
+              className="size-20 absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100 cursor-pointer"
             >
-              <Camera className="h-6 w-6 text-white" />
+              <Camera className="size-6 text-white" />
             </Button>
             <Input
               type="file"

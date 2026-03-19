@@ -57,7 +57,7 @@ export const useWorkspaceMembers = (workspaceId: string | null) => {
         .single();
 
       if (profileError || !profile) {
-        setError('Користувача з таким email не знайдено в системі.');
+        setError('User with this email was not found.');
         return false;
       }
 

@@ -66,7 +66,12 @@ export function CardModal({
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter a title..."
               maxLength={200}
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleSave();
+                }
+              }}
             />
           </div>
           <div className="grid gap-2">
