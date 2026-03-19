@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Card, Column } from '@/shared/types/models.types';
 import { DropResult } from '@hello-pangea/dnd';
+import { useBoardSync } from './use-board-sync';
 
 export const useBoard = (
   boardId: string,
@@ -15,6 +16,8 @@ export const useBoard = (
 
   const [columns, setColumns] = useState<Column[]>(initialColumns);
   const [cards, setCards] = useState<Card[]>(initialCards);
+
+  useBoardSync(boardId, columns, setColumns, setCards);
 
   useEffect(() => {
     setColumns(initialColumns);
