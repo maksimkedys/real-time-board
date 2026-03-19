@@ -37,7 +37,6 @@ export default function ForgotPasswordPage() {
         </CardHeader>
 
         <CardContent className="pb-8">
-          {/* Якщо лист успішно відправлено, показуємо повідомлення замість форми */}
           {state?.success ? (
             <div className="flex flex-col items-center justify-center space-y-3 py-4 text-center">
               <CheckCircle2 className="h-12 w-12 text-green-500" />
@@ -59,6 +58,7 @@ export default function ForgotPasswordPage() {
                   name="email"
                   type="email"
                   placeholder="example@gmail.com"
+                  defaultValue={state?.values?.email}
                   className={cn(
                     'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
                     state?.fieldErrors?.fullName

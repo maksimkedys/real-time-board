@@ -111,6 +111,7 @@ export default function SignUpPage() {
                   id="fullName"
                   name="fullName"
                   placeholder="John Doe"
+                  defaultValue={state?.values?.fullName}
                   className={cn(
                     'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
                     state?.fieldErrors?.fullName
@@ -134,6 +135,7 @@ export default function SignUpPage() {
                   name="email"
                   type="email"
                   placeholder="example@gmail.com"
+                  defaultValue={state?.values?.email}
                   className={cn(
                     'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
                     state?.fieldErrors?.fullName
@@ -158,6 +160,7 @@ export default function SignUpPage() {
                     name="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="password"
+                    defaultValue=""
                     className={cn(
                       'h-10 bg-background border-border text-foreground transition-all placeholder:text-muted-foreground/60',
                       state?.fieldErrors?.fullName

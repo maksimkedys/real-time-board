@@ -18,6 +18,10 @@ export interface AuthState {
     email?: string[];
     password?: string[];
   };
+  values?: {
+    fullName?: string;
+    email?: string;
+  };
 }
 
 async function getSupabaseClient() {
@@ -50,10 +54,14 @@ export async function signUpAction(
 ): Promise<AuthState> {
   try {
     const data = Object.fromEntries(formData.entries());
+    const values = {
+      fullName: data.fullName as string,
+      email: data.email as string,
+    };
     const parsed = signUpSchema.safeParse(data);
 
     if (!parsed.success) {
-      return { fieldErrors: parsed.error.flatten().fieldErrors };
+      return { fieldErrors: parsed.error.flatten().fieldErrors, values };
     }
 
     const { email, password, fullName } = parsed.data;
@@ -70,7 +78,7 @@ export async function signUpAction(
     });
 
     if (signUpError) {
-      return { error: signUpError.message };
+      return { error: signUpError.message, values };
     }
   } catch (err) {
     if (isRedirectError(err)) throw err;
@@ -87,10 +95,11 @@ export async function signInAction(
 ): Promise<AuthState> {
   try {
     const data = Object.fromEntries(formData.entries());
+    const values = { email: data.email as string };
     const parsed = signInSchema.safeParse(data);
 
     if (!parsed.success) {
-      return { fieldErrors: parsed.error.flatten().fieldErrors };
+      return { fieldErrors: parsed.error.flatten().fieldErrors, values };
     }
 
     const { email, password } = parsed.data;
@@ -102,7 +111,7 @@ export async function signInAction(
     });
 
     if (signInError) {
-      return { error: signInError.message };
+      return { error: signInError.message, values };
     }
   } catch (err) {
     if (isRedirectError(err)) throw err;
@@ -120,10 +129,11 @@ export async function forgotPasswordAction(
 ): Promise<AuthState> {
   try {
     const data = Object.fromEntries(formData.entries());
+    const values = { email: data.email as string };
     const parsed = forgotPasswordSchema.safeParse(data);
 
     if (!parsed.success) {
-      return { fieldErrors: parsed.error.flatten().fieldErrors };
+      return { fieldErrors: parsed.error.flatten().fieldErrors, values };
     }
 
     const { email } = parsed.data;
@@ -134,7 +144,7 @@ export async function forgotPasswordAction(
     });
 
     if (error) {
-      return { error: error.message };
+      return { error: error.message, values };
     }
 
     return { success: 'Check your email for the reset link!' };
