@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { DropResult } from '@hello-pangea/dnd';
 
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
 import { Card, Column } from '@/shared/types/models.types';
-import { DropResult } from '@hello-pangea/dnd';
 import { useBoardSync } from './use-board-sync';
 
 export const useBoard = (
@@ -40,6 +40,7 @@ export const useBoard = (
   const handleAddColumn = async (title: string) => {
     const position = columns.length;
     const tempId = crypto.randomUUID();
+    const previousColumns = [...columns];
 
     try {
       const newCol = {
@@ -69,7 +70,7 @@ export const useBoard = (
     } catch (error) {
       pendingColumnIds.current.delete(tempId);
       console.error('Error adding column:', error);
-      setColumns(columns);
+      setColumns(previousColumns);
     }
   };
 
@@ -89,7 +90,6 @@ export const useBoard = (
         .eq('id', columnId);
 
       if (error) throw error;
-
       router.refresh();
     } catch (error) {
       console.error('Error updating column:', error);
@@ -111,7 +111,6 @@ export const useBoard = (
         .eq('id', columnId);
 
       if (error) throw error;
-
       router.refresh();
     } catch (error) {
       console.error('Error deleting column:', error);
@@ -128,6 +127,7 @@ export const useBoard = (
     const columnCards = cards.filter((c) => c.column_id === columnId);
     const position = columnCards.length;
     const tempId = crypto.randomUUID();
+    const previousCards = [...cards];
 
     try {
       const newCard = {
@@ -165,7 +165,7 @@ export const useBoard = (
     } catch (error) {
       pendingCardIds.current.delete(tempId);
       console.error('Error adding card:', error);
-      setCards(cards);
+      setCards(previousCards);
     }
   };
 
@@ -180,7 +180,6 @@ export const useBoard = (
       const { error } = await supabase.from('cards').delete().eq('id', cardId);
 
       if (error) throw error;
-
       router.refresh();
     } catch (error) {
       console.error('Error deleting card:', error);
@@ -222,6 +221,9 @@ export const useBoard = (
       return;
     }
 
+    const previousColumns = [...columns];
+    const previousCards = [...cards];
+
     if (type === 'column') {
       const newColumns = Array.from(columns).sort(
         (a, b) => (a.position || 0) - (b.position || 0)
@@ -233,22 +235,25 @@ export const useBoard = (
         ...col,
         position: index,
       }));
+
       setColumns(updatedColumns);
 
       try {
         if (!supabase) throw new Error('Supabase init error');
 
-        await Promise.all(
-          updatedColumns.map((col) =>
-            supabase
-              .from('columns')
-              .update({ position: col.position })
-              .eq('id', col.id)
-          )
-        );
+        const updates = updatedColumns.map((col) => ({
+          id: col.id,
+          position: col.position,
+        }));
+
+        const { error } = await supabase.rpc('reorder_columns', {
+          updates: JSON.stringify(updates),
+        });
+
+        if (error) throw error;
       } catch (error) {
         console.error('Error updating column positions:', error);
-        setColumns(columns);
+        setColumns(previousColumns); // Відкат
       }
       return;
     }
@@ -286,17 +291,19 @@ export const useBoard = (
         );
 
         try {
-          await Promise.all(
-            updatedCards.map((card) =>
-              supabase!
-                .from('cards')
-                .update({ position: card.position })
-                .eq('id', card.id)
-            )
-          );
+          const updates = updatedCards.map((card) => ({
+            id: card.id,
+            position: card.position,
+          }));
+
+          const { error } = await supabase!.rpc('reorder_cards', {
+            updates: JSON.stringify(updates),
+          });
+
+          if (error) throw error;
         } catch (error) {
           console.error(error);
-          setCards(cards);
+          setCards(previousCards);
         }
       } else {
         const movedCard = {
@@ -327,27 +334,29 @@ export const useBoard = (
         );
 
         try {
-          await Promise.all([
-            supabase!
-              .from('cards')
-              .update({ column_id: destColId, position: destination.index })
-              .eq('id', movedCard.id),
-            ...updatedSource.map((card) =>
-              supabase!
-                .from('cards')
-                .update({ position: card.position })
-                .eq('id', card.id)
-            ),
-            ...updatedDest.map((card) =>
-              supabase!
-                .from('cards')
-                .update({ position: card.position })
-                .eq('id', card.id)
-            ),
-          ]);
+          const sourceUpdates = updatedSource.map((card) => ({
+            id: card.id,
+            position: card.position,
+          }));
+          const destUpdates = updatedDest
+            .filter((card) => card.id !== movedCard.id)
+            .map((card) => ({
+              id: card.id,
+              position: card.position,
+            }));
+
+          const { error } = await supabase!.rpc('move_card', {
+            p_card_id: movedCard.id,
+            p_new_column_id: destColId,
+            p_new_position: destination.index,
+            p_source_updates: JSON.stringify(sourceUpdates),
+            p_dest_updates: JSON.stringify(destUpdates),
+          });
+
+          if (error) throw error;
         } catch (error) {
           console.error(error);
-          setCards(cards);
+          setCards(previousCards);
         }
       }
     }

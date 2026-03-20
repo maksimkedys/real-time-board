@@ -1,16 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
-import { Profile } from '@/shared/types/models.types';
+import { Profile, CardActivityWithProfile } from '@/shared/types/models.types';
 
-export interface CardActivityWithProfile {
-  id: string;
-  action: string | null;
-  created_at: string | null;
-  profiles: {
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
-}
+export type { CardActivityWithProfile };
 
 export const useCardDetails = (cardId: string, isOpen: boolean) => {
   const supabase = createSupabaseBrowserClient();
@@ -32,7 +24,7 @@ export const useCardDetails = (cardId: string, isOpen: boolean) => {
           .select('*')
           .eq('id', user.id)
           .single();
-        setCurrentUser(data as Profile);
+        setCurrentUser(data);
       }
     };
     fetchUser();
@@ -51,9 +43,16 @@ export const useCardDetails = (cardId: string, isOpen: boolean) => {
           .order('created_at', { ascending: false });
 
         if (activitiesError) throw activitiesError;
-        setActivities(
-          (activitiesData as unknown as CardActivityWithProfile[]) || []
+
+        const mapped: CardActivityWithProfile[] = (activitiesData ?? []).map(
+          (row) => ({
+            id: row.id,
+            action: row.action,
+            created_at: row.created_at,
+            profiles: row.profiles,
+          })
         );
+        setActivities(mapped);
       } catch (error) {
         console.error('Error fetching activities:', error);
       } finally {
@@ -77,10 +76,13 @@ export const useCardDetails = (cardId: string, isOpen: boolean) => {
       if (error) throw error;
 
       if (data) {
-        setActivities((prev) => [
-          data as unknown as CardActivityWithProfile,
-          ...prev,
-        ]);
+        const activity: CardActivityWithProfile = {
+          id: data.id,
+          action: data.action,
+          created_at: data.created_at,
+          profiles: data.profiles,
+        };
+        setActivities((prev) => [activity, ...prev]);
       }
     } catch (error) {
       console.error('Error logging activity:', error);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, X, ShieldAlert } from 'lucide-react';
+import { Loader2, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
@@ -29,6 +29,7 @@ export function WorkspaceMembersModal({
     members,
     isLoading,
     error,
+    successMessage,
     removeMember,
     emailValue,
     isSubmitting,
@@ -46,7 +47,8 @@ export function WorkspaceMembersModal({
         <DialogHeader>
           <DialogTitle>Workspace Members</DialogTitle>
           <DialogDescription>
-            Invite people to collaborate on all boards in this workspace.
+            Invite people via magic link to collaborate on all boards in this
+            workspace.
           </DialogDescription>
         </DialogHeader>
 
@@ -63,7 +65,7 @@ export function WorkspaceMembersModal({
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              'Invite'
+              'Send Invite'
             )}
           </Button>
         </form>
@@ -72,6 +74,13 @@ export function WorkspaceMembersModal({
           <div className="flex items-center gap-2 text-sm text-destructive mt-2 bg-destructive/10 p-2 rounded-md">
             <ShieldAlert className="w-4 h-4 shrink-0" />
             <p>{error}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="flex items-center gap-2 text-sm text-green-600 mt-2 bg-green-500/10 p-2 rounded-md">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <p>{successMessage}</p>
           </div>
         )}
 

@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import { createSupabaseBrowserClient } from '@/shared/api/supabase/client';
-import { Profile } from '@/shared/types/models.types';
-
-export interface WorkspaceMemberWithProfile {
-  id: string;
-  role: string | null;
-  user_id: string | null;
-  profiles: Profile | null;
-}
+import { WorkspaceMemberWithProfile } from '@/shared/types/models.types';
+import { sendWorkspaceInvite } from '../actions/workspace-invite.actions';
 
 export const useWorkspaceMembers = (workspaceId: string | null) => {
   const supabase = createSupabaseBrowserClient();
@@ -34,7 +28,16 @@ export const useWorkspaceMembers = (workspaceId: string | null) => {
           .eq('workspace_id', workspaceId);
 
         if (fetchError) throw fetchError;
-        setMembers((data as unknown as WorkspaceMemberWithProfile[]) || []);
+
+        const members: WorkspaceMemberWithProfile[] = (data ?? []).map(
+          (row) => ({
+            id: row.id,
+            role: row.role,
+            user_id: row.user_id,
+            profiles: row.profiles,
+          })
+        );
+        setMembers(members);
       } catch (err: unknown) {
         console.error('Error fetching members:', err);
       } finally {
@@ -45,58 +48,22 @@ export const useWorkspaceMembers = (workspaceId: string | null) => {
     fetchMembers();
   }, [workspaceId, supabase]);
 
-  const addMemberByEmail = async (email: string) => {
+  const inviteMemberByEmail = async (email: string) => {
     setError(null);
-    if (!workspaceId || !supabase) return false;
+    if (!workspaceId) return false;
 
     try {
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email.trim())
-        .single();
+      const result = await sendWorkspaceInvite(email, workspaceId);
 
-      if (profileError || !profile) {
-        setError('User with this email was not found.');
+      if (result.error) {
+        setError(result.error);
         return false;
       }
 
-      const isAlreadyMember = members.some((m) => m.user_id === profile.id);
-      if (isAlreadyMember) {
-        setError('This user is already in workspace');
-        return false;
-      }
-
-      const { data: newMember, error: insertError } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: workspaceId,
-          user_id: profile.id,
-          role: 'member',
-        })
-        .select(
-          `
-          id,
-          role,
-          user_id,
-          profiles (*)
-        `
-        )
-        .single();
-
-      if (insertError) throw insertError;
-
-      if (newMember) {
-        setMembers((prev) => [
-          ...prev,
-          newMember as unknown as WorkspaceMemberWithProfile,
-        ]);
-        return true;
-      }
-      return false;
+      return true;
     } catch (err: unknown) {
-      console.error('Error adding member:', err);
-      setError('Error adding member.');
+      console.error('Error inviting member:', err);
+      setError('Error sending invitation.');
       return false;
     }
   };
@@ -122,7 +89,7 @@ export const useWorkspaceMembers = (workspaceId: string | null) => {
     members,
     isLoading,
     error,
-    addMemberByEmail,
+    inviteMemberByEmail,
     removeMember,
     setError,
   };

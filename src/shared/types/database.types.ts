@@ -242,6 +242,54 @@ export type Database = {
           },
         ];
       };
+      workspace_invitations: {
+        Row: {
+          id: string;
+          workspace_id: string;
+          email: string;
+          invited_by: string | null;
+          token: string;
+          status: string;
+          created_at: string | null;
+          expires_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          workspace_id: string;
+          email: string;
+          invited_by?: string | null;
+          token?: string;
+          status?: string;
+          created_at?: string | null;
+          expires_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          workspace_id?: string;
+          email?: string;
+          invited_by?: string | null;
+          token?: string;
+          status?: string;
+          created_at?: string | null;
+          expires_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'workspace_invitations_workspace_id_fkey';
+            columns: ['workspace_id'];
+            isOneToOne: false;
+            referencedRelation: 'workspaces';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'workspace_invitations_invited_by_fkey';
+            columns: ['invited_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       workspaces: {
         Row: {
           created_at: string | null;
@@ -276,7 +324,34 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      accept_workspace_invitation: {
+        Args: {
+          p_token: string;
+        };
+        Returns: Json;
+      };
+      move_card: {
+        Args: {
+          p_card_id: string;
+          p_new_column_id: string;
+          p_new_position: number;
+          p_source_updates: Json;
+          p_dest_updates: Json;
+        };
+        Returns: undefined;
+      };
+      reorder_cards: {
+        Args: {
+          updates: Json;
+        };
+        Returns: undefined;
+      };
+      reorder_columns: {
+        Args: {
+          updates: Json;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;
